@@ -1,0 +1,24 @@
+# Dependencies
+node_modules
+
+# Nuxt build outputs
+.nuxt
+.output
+
+# Common build artifacts
+build
+dist
+coverage
+
+# Next.js build outputs
+.next
+out
+
+# Lock files (avoid re-formatting churn)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Generated assets
+public/mock
+public/avatars
