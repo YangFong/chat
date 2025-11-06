@@ -54,10 +54,11 @@ export function ChatSidebar() {
   return (
     <div className="bg-muted/20 flex h-full flex-col border-r">
       {/* Header */}
-      <div className="flex items-center justify-between border-b p-4">
-        <h2 className="text-lg font-semibold">对话历史</h2>
-        <Button onClick={handleNew} size="icon" variant="ghost">
-          <Plus className="h-4 w-4" />
+      <div className="border-b p-4">
+        <h2 className="mb-3 text-lg font-semibold">对话历史</h2>
+        <Button onClick={handleNew} variant="outline" className="w-full">
+          <Plus className="mr-2 h-4 w-4" />
+          新建对话
         </Button>
       </div>
 

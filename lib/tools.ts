@@ -79,17 +79,35 @@ export async function getWeather(
 // 执行工具调用
 export async function executeTool(name: string, args: string): Promise<string> {
   try {
-    const params = JSON.parse(args)
+    // 处理空字符串或无效的 JSON
+    let params: Record<string, unknown> = {}
+    if (args && args.trim()) {
+      try {
+        params = JSON.parse(args)
+      } catch (parseError) {
+        console.error("Failed to parse tool arguments:", args, parseError)
+        return JSON.stringify({
+          error: `Invalid JSON arguments: ${parseError}`,
+        })
+      }
+    }
 
     switch (name) {
       case "get_weather": {
-        const result = await getWeather(params as WeatherParams)
+        // 验证必需参数
+        if (!params.location || typeof params.location !== "string") {
+          return JSON.stringify({
+            error: "缺少必需参数: location（城市名称）",
+          })
+        }
+        const result = await getWeather(params as unknown as WeatherParams)
         return JSON.stringify(result)
       }
       default:
         return JSON.stringify({ error: `Unknown tool: ${name}` })
     }
   } catch (error) {
+    console.error("Tool execution error:", error)
     return JSON.stringify({ error: `Tool execution failed: ${error}` })
   }
 }

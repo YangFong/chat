@@ -120,3 +120,41 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Prose 样式优化 */
+@layer components {
+  .prose {
+    @apply max-w-full;
+    word-break: break-word;
+  }
+
+  .prose p {
+    @apply wrap-break-word;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .prose pre {
+    @apply max-w-full overflow-x-auto;
+  }
+
+  .prose code {
+    @apply wrap-break-word;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .prose a {
+    @apply wrap-break-word;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    display: inline-block;
+    max-width: 100%;
+  }
+
+  /* 强制所有文本内容都可以断行 */
+  .prose * {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+}

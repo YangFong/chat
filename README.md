@@ -6,10 +6,12 @@
 
 - ✨ **常规 AI 对话**：支持自然语言问答
 - 🛠️ **工具调用**：支持天气查询等工具，AI 可智能调用并展示结果
-- 💾 **本地存储**：聊天记录保存在浏览器本地，无需数据库
-- 🎨 **现代 UI**：基于 shadcn/ui 的精美界面
+- � **Markdown 渲染**：AI 回复支持完整 Markdown 格式，包括代码高亮
+- �💾 **本地存储**：聊天记录保存在浏览器本地，无需数据库
+- 🎨 **现代 UI**：基于 shadcn/ui 的精美界面，支持主题切换
 - 📱 **响应式设计**：支持桌面和移动端
 - 🔄 **流式响应**：实时显示 AI 回复
+- 🗂️ **对话管理**：支持多对话切换、删除确认、时间戳显示
 
 ## 技术栈
 
@@ -17,7 +19,9 @@
 - **AI 服务**: SiliconFlow API
 - **状态管理**: Zustand (持久化到 localStorage)
 - **UI 组件**: shadcn/ui + Radix UI
-- **样式**: Tailwind CSS
+- **样式**: Tailwind CSS + Typography
+- **Markdown**: react-markdown + remark-gfm + rehype-highlight
+- **主题**: next-themes (浅色/深色/系统)
 - **类型检查**: TypeScript
 - **代码质量**: ESLint + Prettier
 

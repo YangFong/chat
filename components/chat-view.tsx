@@ -220,20 +220,23 @@ export function ChatView() {
     <div className="flex h-full flex-col">
       {/* Messages */}
       {hasMessages ? (
-        <ScrollArea className="flex-1 px-4">
-          <div ref={scrollRef} className="mx-auto max-w-3xl py-4">
-            {currentConversation.messages.map((message) => (
-              <MessageItem key={message.id} message={message} />
-            ))}
+        <div className="relative flex-1 overflow-hidden">
+          <ScrollArea className="h-full">
+            <div className="mx-auto max-w-3xl px-4 py-4">
+              {currentConversation.messages.map((message) => (
+                <MessageItem key={message.id} message={message} />
+              ))}
 
-            {isLoading && (
-              <div className="text-muted-foreground flex items-center gap-2 py-4">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span className="text-sm">AI 正在思考...</span>
-              </div>
-            )}
-          </div>
-        </ScrollArea>
+              {isLoading && (
+                <div className="text-muted-foreground flex items-center gap-2 py-4">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span className="text-sm">AI 正在思考...</span>
+                </div>
+              )}
+              <div ref={scrollRef} />
+            </div>
+          </ScrollArea>
+        </div>
       ) : (
         <div className="flex flex-1 items-center justify-center">
           <div className="text-muted-foreground text-center">
