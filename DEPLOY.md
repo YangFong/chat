@@ -37,6 +37,7 @@ netlify deploy --prod
 ```
 
 环境变量配置：
+
 - 在 Netlify Dashboard -> Site settings -> Environment variables 添加
 
 ### Docker 部署
@@ -134,16 +135,16 @@ server {
 
 ### 必需变量
 
-| 变量名 | 说明 | 示例 |
-|--------|------|------|
+| 变量名                | 说明                 | 示例       |
+| --------------------- | -------------------- | ---------- |
 | `SILICONFLOW_API_KEY` | SiliconFlow API 密钥 | `sk-xxxxx` |
 
 ### 可选变量
 
-| 变量名 | 说明 | 默认值 |
-|--------|------|--------|
+| 变量名                 | 说明         | 默认值                          |
+| ---------------------- | ------------ | ------------------------------- |
 | `SILICONFLOW_BASE_URL` | API 基础 URL | `https://api.siliconflow.cn/v1` |
-| `NODE_ENV` | 运行环境 | `production` |
+| `NODE_ENV`             | 运行环境     | `production`                    |
 
 ## 性能优化
 
@@ -164,7 +165,7 @@ const nextConfig = {
 
 ```typescript
 const nextConfig = {
-  assetPrefix: 'https://cdn.example.com',
+  assetPrefix: "https://cdn.example.com",
   // ...
 }
 ```
@@ -187,7 +188,7 @@ pnpm add @vercel/analytics
 
 ```tsx
 // app/layout.tsx
-import { Analytics } from '@vercel/analytics/react'
+import { Analytics } from "@vercel/analytics/react"
 
 export default function RootLayout({ children }) {
   return (

@@ -34,18 +34,17 @@ export function ChatView() {
     }
   }, [currentConversation?.messages])
 
-  // 如果没有当前对话，创建一个
-  useEffect(() => {
-    if (!currentConversation) {
-      const id = createConversation()
-      setCurrentConversation(id)
-    }
-  }, [currentConversation, createConversation, setCurrentConversation])
-
   const handleSend = async (content: string) => {
-    if (!currentConversation || isLoading) return
+    if (isLoading) return
 
     setError(null)
+
+    // 如果没有当前对话，创建一个新对话
+    let conversationId = currentConversation?.id
+    if (!conversationId) {
+      conversationId = createConversation()
+      setCurrentConversation(conversationId)
+    }
 
     // 添加用户消息
     const userMessage: Message = {
@@ -54,7 +53,7 @@ export function ChatView() {
       content,
       createdAt: Date.now(),
     }
-    addMessage(currentConversation.id, userMessage)
+    addMessage(conversationId, userMessage)
 
     // 创建助手消息（初始为空）
     const assistantMessageId = generateId()
@@ -64,14 +63,14 @@ export function ChatView() {
       content: "",
       createdAt: Date.now(),
     }
-    addMessage(currentConversation.id, assistantMessage)
+    addMessage(conversationId, assistantMessage)
 
     setIsLoading(true)
 
     try {
-      // 准备消息历史
+      // 准备消息历史（包括刚发送的用户消息）
       const messages = [
-        ...currentConversation.messages.map((msg) => ({
+        ...(currentConversation?.messages || []).map((msg) => ({
           role: msg.role,
           content: msg.content,
           tool_calls: msg.toolCalls,
@@ -134,7 +133,7 @@ export function ChatView() {
               // 处理内容流
               if (parsed.type === "content" && parsed.content) {
                 currentContent += parsed.content
-                updateMessage(currentConversation.id, assistantMessageId, {
+                updateMessage(conversationId, assistantMessageId, {
                   content: currentContent,
                 })
               }
@@ -142,7 +141,7 @@ export function ChatView() {
               // 处理工具调用
               if (parsed.type === "tool_calls" && parsed.tool_calls) {
                 currentToolCalls = parsed.tool_calls
-                updateMessage(currentConversation.id, assistantMessageId, {
+                updateMessage(conversationId, assistantMessageId, {
                   toolCalls: currentToolCalls,
                 })
               }
@@ -159,7 +158,7 @@ export function ChatView() {
                     createdAt: Date.now(),
                     toolCallId: result.tool_call_id,
                   }
-                  addMessage(currentConversation.id, toolMessage)
+                  addMessage(conversationId, toolMessage)
                 }
               }
             } catch {
@@ -187,41 +186,64 @@ export function ChatView() {
   }
 
   if (!currentConversation) {
+    // 无对话时，输入框居中显示
     return (
-      <div className="flex h-full items-center justify-center">
-        <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
+      <div className="flex h-full flex-col items-center justify-center p-4">
+        <div className="w-full max-w-3xl space-y-6">
+          <div className="text-muted-foreground text-center">
+            <h1 className="mb-2 text-2xl font-bold">AI 聊天助手</h1>
+            <p className="text-sm">
+              试试问我：&quot;今天北京天气怎么样？&quot;
+            </p>
+          </div>
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+          {isLoading ? (
+            <Button onClick={handleStop} variant="outline" className="w-full">
+              停止生成
+            </Button>
+          ) : (
+            <ChatInput onSend={handleSend} disabled={isLoading} />
+          )}
+        </div>
       </div>
     )
   }
 
+  const hasMessages = currentConversation.messages.length > 0
+
   return (
     <div className="flex h-full flex-col">
       {/* Messages */}
-      <ScrollArea className="flex-1 px-4">
-        <div ref={scrollRef} className="mx-auto max-w-3xl py-4">
-          {currentConversation.messages.length === 0 ? (
-            <div className="flex h-full items-center justify-center">
-              <div className="text-muted-foreground text-center">
-                <p className="text-lg font-medium">开始对话</p>
-                <p className="text-sm">
-                  试试问我：&quot;今天北京天气怎么样？&quot;
-                </p>
-              </div>
-            </div>
-          ) : (
-            currentConversation.messages.map((message) => (
+      {hasMessages ? (
+        <ScrollArea className="flex-1 px-4">
+          <div ref={scrollRef} className="mx-auto max-w-3xl py-4">
+            {currentConversation.messages.map((message) => (
               <MessageItem key={message.id} message={message} />
-            ))
-          )}
+            ))}
 
-          {isLoading && (
-            <div className="text-muted-foreground flex items-center gap-2 py-4">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span className="text-sm">AI 正在思考...</span>
-            </div>
-          )}
+            {isLoading && (
+              <div className="text-muted-foreground flex items-center gap-2 py-4">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="text-sm">AI 正在思考...</span>
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+      ) : (
+        <div className="flex flex-1 items-center justify-center">
+          <div className="text-muted-foreground text-center">
+            <p className="text-lg font-medium">开始对话</p>
+            <p className="text-sm">
+              试试问我：&quot;今天北京天气怎么样？&quot;
+            </p>
+          </div>
         </div>
-      </ScrollArea>
+      )}
 
       {/* Error */}
       {error && (

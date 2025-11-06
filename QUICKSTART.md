@@ -39,6 +39,7 @@ pnpm exec tsc --noEmit
 ## 🧪 测试问题
 
 ### 常规对话
+
 ```
 你好
 解释什么是人工智能
@@ -46,6 +47,7 @@ pnpm exec tsc --noEmit
 ```
 
 ### 工具调用（天气）
+
 ```
 今天北京天气怎么样？
 上海现在的天气如何？
@@ -91,6 +93,7 @@ SILICONFLOW_BASE_URL=https://api.siliconflow.cn/v1
 ## 🐛 故障排查
 
 ### 端口占用
+
 ```bash
 lsof -ti:3000 | xargs kill -9
 rm -rf .next
@@ -98,10 +101,12 @@ pnpm dev
 ```
 
 ### API 错误
+
 - 检查 `.env.local` 中的 API 密钥
 - 重启开发服务器
 
 ### 构建失败
+
 ```bash
 rm -rf .next node_modules
 pnpm install
@@ -148,12 +153,14 @@ pnpm build
 ## 🌐 部署
 
 ### Vercel（最简单）
+
 1. 推送到 GitHub
 2. 导入到 Vercel
 3. 配置环境变量
 4. 部署
 
 ### Docker
+
 ```bash
 docker build -t ai-chat .
 docker run -p 3000:3000 \

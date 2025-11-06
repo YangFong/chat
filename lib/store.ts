@@ -13,7 +13,7 @@ interface ChatStore {
   // 操作
   createConversation: () => string
   deleteConversation: (id: string) => void
-  setCurrentConversation: (id: string) => void
+  setCurrentConversation: (id: string | null) => void
   addMessage: (conversationId: string, message: Message) => void
   updateMessage: (
     conversationId: string,
@@ -70,12 +70,19 @@ export const useChatStore = create<ChatStore>()(
         })
       },
 
-      setCurrentConversation: (id: string) => {
-        const conversation = get().conversations.find((c) => c.id === id)
-        set({
-          currentConversationId: id,
-          currentConversation: conversation || null,
-        })
+      setCurrentConversation: (id: string | null) => {
+        if (id === null) {
+          set({
+            currentConversationId: null,
+            currentConversation: null,
+          })
+        } else {
+          const conversation = get().conversations.find((c) => c.id === id)
+          set({
+            currentConversationId: id,
+            currentConversation: conversation || null,
+          })
+        }
       },
 
       addMessage: (conversationId: string, message: Message) => {
