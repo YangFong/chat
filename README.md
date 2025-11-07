@@ -46,7 +46,24 @@ cp .env.local.example .env.local
 ```env
 SILICONFLOW_API_KEY=your_api_key_here
 SILICONFLOW_BASE_URL=https://api.siliconflow.cn/v1
+
+# 可选：配置高德地图 API 获取真实天气数据
+# 免费无限制
+# 获取API key：https://console.amap.com/dev/key/app
+AMAP_API_KEY=your_amap_api_key_here
 ```
+
+> 💡 **天气API说明**：
+>
+> - 如果不配置 `AMAP_API_KEY`，系统会使用模拟天气数据
+> - 配置后可以获取全国城市的实时天气信息
+> - 高德地图API免费且无调用次数限制
+
+> 💡 **天气API说明**：
+>
+> - 如果不配置 `OPENWEATHERMAP_API_KEY`，系统会使用模拟天气数据
+> - 配置后可以获取全球城市的实时天气信息
+> - 免费层级足够个人使用（1000次/天）
 
 > 💡 获取 API 密钥：访问 [SiliconFlow](https://cloud.siliconflow.cn/) 注册并获取 API Key
 

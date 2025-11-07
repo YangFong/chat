@@ -26,16 +26,120 @@ export const tools: ToolDefinition[] = [
   },
 ]
 
-// 模拟天气 API（实际项目可以接入真实天气 API）
+// 高德地图天气API（免费）
 export async function getWeather(
   params: WeatherParams
 ): Promise<WeatherResult> {
-  // 模拟 API 延迟
-  await new Promise((resolve) => setTimeout(resolve, 500))
+  try {
+    // 使用高德地图天气API
+    const apiKey = process.env.AMAP_API_KEY || "demo_key"
+    const city = params.location
 
+    // 如果没有API key，使用模拟数据
+    if (!process.env.AMAP_API_KEY || apiKey === "demo_key") {
+      console.log("使用模拟天气数据（未配置 AMAP_API_KEY）")
+      return getMockWeather(params)
+    }
+
+    // 首先获取城市的adcode
+    const adcode = await getCityAdcode(city, apiKey)
+    if (!adcode) {
+      console.log(`无法找到城市 ${city} 的编码，使用模拟数据`)
+      return getMockWeather(params)
+    }
+
+    // 获取天气信息（实况天气）
+    const response = await fetch(
+      `https://restapi.amap.com/v3/weather/weatherInfo?city=${adcode}&key=${apiKey}&extensions=base`
+    )
+
+    if (!response.ok) {
+      throw new Error(`高德天气API请求失败: ${response.status}`)
+    }
+
+    const data = await response.json()
+
+    if (data.status !== "1" || !data.lives || data.lives.length === 0) {
+      throw new Error(`获取天气数据失败: ${data.info}`)
+    }
+
+    const weatherInfo = data.lives[0]
+    const unit = params.unit || "celsius"
+
+    // 如果需要华氏度，进行转换
+    let temperature = parseInt(weatherInfo.temperature)
+    let tempUnit = "°C"
+    if (unit === "fahrenheit") {
+      temperature = Math.round((temperature * 9) / 5 + 32)
+      tempUnit = "°F"
+    }
+
+    return {
+      location: weatherInfo.city,
+      temperature: temperature,
+      unit: tempUnit,
+      condition: weatherInfo.weather,
+      humidity: parseInt(weatherInfo.humidity),
+      windSpeed: convertWindPower(weatherInfo.windpower),
+    }
+  } catch (error) {
+    console.error("获取真实天气数据失败:", error)
+    // 失败时返回模拟数据
+    return getMockWeather(params)
+  }
+}
+
+// 获取城市的adcode
+async function getCityAdcode(
+  cityName: string,
+  apiKey: string
+): Promise<string | null> {
+  try {
+    // 使用地理编码API获取城市信息
+    const response = await fetch(
+      `https://restapi.amap.com/v3/config/district?keywords=${encodeURIComponent(cityName)}&key=${apiKey}&subdistrict=0`
+    )
+
+    if (!response.ok) {
+      return null
+    }
+
+    const data = await response.json()
+
+    if (data.status !== "1" || !data.districts || data.districts.length === 0) {
+      return null
+    }
+
+    return data.districts[0].adcode
+  } catch (error) {
+    console.error("获取城市编码失败:", error)
+    return null
+  }
+}
+
+// 将风力等级转换为风速（km/h）
+function convertWindPower(windpower: string): number {
+  // 风力等级对应的风速范围（取中间值）
+  const windPowerMap: Record<string, number> = {
+    "≤3": 10,
+    "4": 20,
+    "5": 30,
+    "6": 45,
+    "7": 60,
+    "8": 75,
+    "9": 90,
+    "10": 105,
+    "11": 120,
+    "12": 135,
+  }
+
+  return windPowerMap[windpower] || 15
+}
+
+// 模拟天气数据（备用）
+function getMockWeather(params: WeatherParams): WeatherResult {
   const unit = params.unit || "celsius"
 
-  // 模拟天气数据
   const weatherData: Record<string, WeatherResult> = {
     北京: {
       location: "北京",
@@ -63,7 +167,6 @@ export async function getWeather(
     },
   }
 
-  // 返回天气数据，如果城市不存在则返回默认数据
   return (
     weatherData[params.location] || {
       location: params.location,

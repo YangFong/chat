@@ -72,6 +72,7 @@ export async function POST(req: NextRequest) {
             type: string
             function: { name: string; arguments: string }
           }> = []
+          const executedToolKeys = new Set<string>() // 记录已执行的工具调用（去重）
 
           while (true) {
             const { done, value } = await reader.read()
@@ -94,9 +95,29 @@ export async function POST(req: NextRequest) {
                       )
                     )
 
-                    // 执行所有工具调用
+                    // 执行所有工具调用（去重）
                     const toolResults = await Promise.all(
                       toolCalls.map(async (call) => {
+                        // 生成工具调用的唯一标识（工具名 + 参数）
+                        const toolKey = `${call.function.name}:${call.function.arguments}`
+
+                        // 如果已经执行过相同的工具调用，返回缓存结果
+                        if (executedToolKeys.has(toolKey)) {
+                          console.log(
+                            `跳过重复的工具调用: ${call.function.name}`
+                          )
+                          return {
+                            role: "tool",
+                            tool_call_id: call.id,
+                            content: JSON.stringify({
+                              error: "该查询已执行，请参考上一次的结果",
+                            }),
+                          }
+                        }
+
+                        // 标记为已执行
+                        executedToolKeys.add(toolKey)
+
                         const result = await executeTool(
                           call.function.name,
                           call.function.arguments
